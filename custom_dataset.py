@@ -5,7 +5,27 @@ from PIL import Image
 import numpy as np
 from skimage import transform as sktransform
 from data_aug import *
+import math
 
+
+def twoD_Gaussian(m, n, amplitude, sigma_x, sigma_y):
+    x = np.linspace(-m, m, 2 * m + 1)
+    y = np.linspace(-n, n, 2 * n + 1)
+    x, y = np.meshgrid(x, y)
+    xo = 0.0
+    yo = 0.0
+    theta = 0.0
+    offset = 0.0
+    a = (np.cos(theta)**2)/(2*sigma_x**2) + (np.sin(theta)**2)/(2*sigma_y**2)
+    b = -(np.sin(2*theta))/(4*sigma_x**2) + (np.sin(2*theta))/(4*sigma_y**2)
+    c = (np.sin(theta)**2)/(2*sigma_x**2) + (np.cos(theta)**2)/(2*sigma_y**2)
+    g = offset + amplitude*np.exp( - (a*((x-xo)**2) + 2*b*(x-xo)*(y-yo)
+                            + c*((y-yo)**2)))
+    g[g < np.finfo(g.dtype).eps * g.max()] = 0
+    sumg = g.sum()
+    if sumg != 0:
+        g /= sumg
+    return g
 
 class CustomDataset(torch.utils.data.Dataset):
     def __init__(self, root):
@@ -69,8 +89,14 @@ class CustomDataset(torch.utils.data.Dataset):
         gt_boxes = []
         for line in annoFile:
             bbox = list(map(float, line.split()))
-            gt_boxes.append([int(bbox[0])+1, int(bbox[1])+1, int(bbox[2]) -
-                            int(bbox[0])+1, int(bbox[3])-int(bbox[1]), int(bbox[4])])
+            gt_boxes.append([
+                int(bbox[1] * 1920) + 1, 
+                int(bbox[2] * 1088) + 1, 
+                int(bbox[3] * 1920) - int(bbox[1] * 1920) + 1,
+                int(bbox[4] * 1088) - int(bbox[2] * 1088),
+                int(bbox[0])
+            ]
+        )
         return gt_boxes
 
     def __getitem__(self, idx):
