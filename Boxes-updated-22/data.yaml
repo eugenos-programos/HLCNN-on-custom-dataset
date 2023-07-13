@@ -1,0 +1,12 @@
+names:
+- Box
+nc: 1
+roboflow:
+  license: CC BY 4.0
+  project: boxes-updated
+  url: https://universe.roboflow.com/boxes-dataset-minmax/boxes-updated/dataset/22
+  version: 22
+  workspace: boxes-dataset-minmax
+test: ../test/images
+train: Boxes-updated-22/train/images
+val: Boxes-updated-22/valid/images
