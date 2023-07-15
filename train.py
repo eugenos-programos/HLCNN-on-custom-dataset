@@ -8,9 +8,10 @@ import visdom
 import matplotlib as mpl
 import localizerVgg
 from custom_dataset import CustomDataset
+import argparse
 
 
-from scipy.ndimage.filters import maximum_filter, median_filter
+from scipy.ndimage.filters import maximum_filter
 from scipy.ndimage.morphology import generate_binary_structure, binary_erosion
 
 def detect_peaks(image):
@@ -44,12 +45,14 @@ vis = visdom.Visdom(server='http://localhost', port='8097')
 cm_jet = mpl.cm.get_cmap('jet')
 
 model = localizerVgg.localizervgg16(pretrained=True)
-model
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-f', '--folder', required=True, help="folder with images for training")
+args = parser.parse_args()
 
 device = torch.device("cpu")
 
-train_dataset = CustomDataset("Boxes-updated-22/train")
+train_dataset = CustomDataset(args.folder)
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=0)
 
 criterionGAM = nllloss()

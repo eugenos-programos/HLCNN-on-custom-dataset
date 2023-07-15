@@ -62,7 +62,7 @@ class CustomDataset(torch.utils.data.Dataset):
                             int(bbox[0])+1, int(bbox[3])-int(bbox[1]), int(bbox[4])])
         return gt_boxes
 
-    def __transform_boxes_coords__(self, boxes_coords, img_size=640):
+    def _transform_boxes_coords(self, boxes_coords, img_size=640):
         center_x, center_y, width, height = boxes_coords
         x_1 = center_x - width / 2
         x_2 = center_x + width / 2
@@ -89,13 +89,8 @@ class CustomDataset(torch.utils.data.Dataset):
         gt_boxes = []
         for line in annoFile:
             bbox = list(map(float, line.split()))
-            gt_boxes.append([
-                int(bbox[1] * 1920) + 1, 
-                int(bbox[2] * 1088) + 1, 
-                int(bbox[3] * 1920) - int(bbox[1] * 1920) + 1,
-                int(bbox[4] * 1088) - int(bbox[2] * 1088),
-                int(bbox[0])
-            ]
+            gt_boxes.append(
+                self._transform_boxes_coords(bbox[1:]) + [bbox[0]]
         )
         return gt_boxes
 
