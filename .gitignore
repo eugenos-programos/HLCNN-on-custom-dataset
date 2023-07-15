@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+Boxes-updated-22/
 
 # C extensions
 *.so
