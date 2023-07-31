@@ -44,24 +44,27 @@ def vis_MAP(MAP, vis, epoch, batch_idx, mapId, upsampler):
 vis = visdom.Visdom(server='http://localhost', port='8097')
 cm_jet = mpl.cm.get_cmap('jet')
 
-model = localizerVgg.localizervgg16(pretrained=True)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = localizerVgg.localizervgg16(pretrained=True).to(device)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--folder', required=True, help="folder with images for training")
+parser.add_argument('--epochs', required=True, help="number of epochs", type=int)
+parser.add_argument('--lr', required=True, help="learning rate", type=float)
+parser.add_argument('--batch', required=True, help="batch size", type=int)
 args = parser.parse_args()
 
-device = torch.device("cpu")
 
 train_dataset = CustomDataset(args.folder)
-train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=0)
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch, shuffle=True, num_workers=0)
 
 criterionGAM = nllloss()
 
-optimizer_ft = optim.Adam(model.parameters(), lr=0.0001)
+optimizer_ft = optim.Adam(model.parameters(), lr=args.lr)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=20, gamma=0.1)
 model.train()
 
-for epoch in range(35):
+for epoch in range(args.epochs):
 
     scheduler.step(epoch)
     for batch_idx, (data, GAM, numCar) in enumerate(train_loader):

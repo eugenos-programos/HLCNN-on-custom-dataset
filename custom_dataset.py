@@ -112,7 +112,7 @@ class CustomDataset(torch.utils.data.Dataset):
 
         numCar = 0
         if gt_bbox.shape[0] > 0:
-            gt_boxes = np.asarray(self.resize_bbox(gt_bbox, (H, W), (o_H, o_W)), dtype=np.float)
+            gt_boxes = np.asarray(self.resize_bbox(gt_bbox, (H, W), (o_H, o_W)), dtype=float)
 
             gt_boxes[:, 2] = gt_boxes[:, 0] + gt_boxes[:, 2]
             gt_boxes[:, 3] = gt_boxes[:, 1] + gt_boxes[:, 3]
@@ -138,7 +138,7 @@ class CustomDataset(torch.utils.data.Dataset):
 
             for bbox in gt_boxes:
 
-                bbox = np.asarray(bbox, dtype=np.int)
+                bbox = np.asarray(bbox, dtype=int)
 
                 dhsizeh = int(bbox[3] / 2)
                 dhsizew = int(bbox[2] / 2)
